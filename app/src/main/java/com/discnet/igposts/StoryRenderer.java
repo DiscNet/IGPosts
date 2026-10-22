@@ -66,7 +66,10 @@ final class StoryRenderer {
     private void card(Canvas canvas, EditorState state, Bitmap artwork, Bitmap avatar) {
         float w = WIDTH * state.cardPercent / 100f;
         float x = (WIDTH - w) / 2f;
-        float imageH = "1:1".equals(state.ratio) ? w : w * 4f / 3f;
+        // O compartilhamento do Instagram mostra o retrato em janela 4:5.
+        // A proporção da arte continua 3:4; Preencher recorta, Encaixar preserva.
+        float imageH = "1:1".equals(state.ratio) ? w
+                : w * (state.instagramCrop ? 5f / 4f : 4f / 3f);
         float headerH = 104f * w / 864f;
         float fontScale = w / 864f;
         float pad = 26f * fontScale;
@@ -85,7 +88,7 @@ final class StoryRenderer {
                 .setEllipsize(TextUtils.TruncateAt.END)
                 .setBreakStrategy(Layout.BREAK_STRATEGY_SIMPLE)
                 .build();
-        float footerH = Math.max(108f * fontScale, footerLayout.getHeight() + 38f * fontScale);
+        float footerH = Math.max(120f * fontScale, footerLayout.getHeight() + 38f * fontScale);
         float total = headerH + imageH + footerH;
         float y = (HEIGHT - total) / 2f + state.verticalOffset;
         y = Math.max(48f, Math.min(y, HEIGHT - total - 48f));
@@ -96,8 +99,8 @@ final class StoryRenderer {
         p.reset();
         p.setAntiAlias(true);
         p.setFilterBitmap(true);
-        p.setColor(Color.WHITE);
-        p.setShadowLayer(14f * fontScale, 0f, 3f * fontScale, 0x23000000);
+        p.setColor(state.glassChrome ? 0xC8FFFFFF : Color.WHITE);
+        p.setShadowLayer(14f * fontScale, 0f, 3f * fontScale, 0x17000000);
         canvas.drawRoundRect(x, y, x + w, y + total, radius, radius, p);
         p.clearShadowLayer();
 
@@ -106,9 +109,13 @@ final class StoryRenderer {
         clipPath.addRoundRect(new RectF(x, y, x + w, y + total), radius, radius, Path.Direction.CW);
         canvas.clipPath(clipPath);
 
-        // Barra superior inspirada no compartilhamento de uma publicação.
-        p.setColor(Color.WHITE);
-        canvas.drawRect(x, y, x + w, y + headerH, p);
+        // Vidro translúcido deixa aparecer o fundo já desfocado por trás do card.
+        if (state.glassChrome) {
+            drawGlassSurface(canvas, x, y, x + w, y + headerH, true, fontScale);
+        } else {
+            p.setColor(Color.WHITE);
+            canvas.drawRect(x, y, x + w, y + headerH, p);
+        }
         float avatarRadius = 31f * fontScale;
         float avatarCx = x + 57f * fontScale;
         float avatarCy = y + headerH / 2f;
@@ -158,13 +165,65 @@ final class StoryRenderer {
             p.setTextAlign(Paint.Align.LEFT);
         }
 
-        p.setColor(Color.WHITE);
-        canvas.drawRect(x, imageBounds.bottom, x + w, y + total, p);
+        if (state.glassImageBorder) drawGlassImageBorder(canvas, imageBounds, fontScale);
+        if (state.glassChrome) {
+            drawGlassSurface(canvas, x, imageBounds.bottom, x + w, y + total, false, fontScale);
+        } else {
+            p.setColor(Color.WHITE);
+            canvas.drawRect(x, imageBounds.bottom, x + w, y + total, p);
+        }
         int save = canvas.save();
         canvas.translate(x + pad, imageBounds.bottom + (footerH - footerLayout.getHeight()) / 2f);
         footerLayout.draw(canvas);
         canvas.restoreToCount(save);
+        if (state.glassChrome) {
+            p.setShader(null);
+            p.setStyle(Paint.Style.STROKE);
+            p.setStrokeWidth(1.4f * fontScale);
+            p.setColor(0xA6FFFFFF);
+            float inset = p.getStrokeWidth();
+            canvas.drawRoundRect(x + inset, y + inset,
+                    x + w - inset, y + total - inset,
+                    radius - inset, radius - inset, p);
+            p.setStyle(Paint.Style.FILL);
+        }
         canvas.restoreToCount(clip);
+    }
+
+    private void drawGlassSurface(Canvas canvas, float left, float top, float right,
+                                  float bottom, boolean upper, float scale) {
+        p.setStyle(Paint.Style.FILL);
+        p.setColor(Color.WHITE);
+        p.setShader(new LinearGradient(left, top, right, bottom,
+                upper ? 0x3FFFFFFF : 0x17FFFFFF,
+                upper ? 0x0FFFFFFF : 0x32FFFFFF, Shader.TileMode.CLAMP));
+        canvas.drawRect(left, top, right, bottom, p);
+        p.setShader(null);
+        p.setStrokeWidth(1f * scale);
+        p.setColor(0x60FFFFFF);
+        float lineY = upper ? bottom - p.getStrokeWidth() : top + p.getStrokeWidth();
+        canvas.drawLine(left + 8f * scale, lineY, right - 8f * scale, lineY, p);
+    }
+
+    private void drawGlassImageBorder(Canvas canvas, RectF bounds, float scale) {
+        float inset = 2f * scale;
+        p.setStyle(Paint.Style.FILL);
+        p.setColor(Color.WHITE);
+        p.setShader(new LinearGradient(bounds.left, bounds.top,
+                bounds.left, bounds.top + 14f * scale,
+                0x48FFFFFF, 0x00FFFFFF, Shader.TileMode.CLAMP));
+        canvas.drawRect(bounds.left, bounds.top,
+                bounds.right, bounds.top + 14f * scale, p);
+        p.setShader(null);
+        p.setStyle(Paint.Style.STROKE);
+        p.setStrokeWidth(1.4f * scale);
+        p.setShader(new LinearGradient(bounds.left, bounds.top,
+                bounds.right, bounds.bottom,
+                0xB8FFFFFF, 0x55FFFFFF, Shader.TileMode.CLAMP));
+        canvas.drawRect(bounds.left + inset, bounds.top + inset,
+                bounds.right - inset, bounds.bottom - inset, p);
+        p.setShader(null);
+        p.setStyle(Paint.Style.FILL);
     }
 
     private static String ellipsize(String value, Paint paint, float width) {

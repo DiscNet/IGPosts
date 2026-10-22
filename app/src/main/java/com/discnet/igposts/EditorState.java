@@ -14,6 +14,9 @@ final class EditorState {
     String hashtags = "#graphicdesign #designgrafico #editorialdesign #design";
     String ratio = "3:4";
     boolean cropToFill = true;
+    boolean instagramCrop = true; // 4:5 share view, keeps original art intact
+    boolean glassChrome = false;
+    boolean glassImageBorder = false;
     int cardPercent = 80;
     int verticalOffset = 0;
     int darkness = 39;
@@ -53,6 +56,9 @@ final class EditorState {
             json.put("hashtags", hashtags);
             json.put("ratio", ratio);
             json.put("cropToFill", cropToFill);
+            json.put("instagramCrop", instagramCrop);
+            json.put("glassChrome", glassChrome);
+            json.put("glassImageBorder", glassImageBorder);
             json.put("cardPercent", cardPercent);
             json.put("verticalOffset", verticalOffset);
             json.put("darkness", darkness);
@@ -81,6 +87,9 @@ final class EditorState {
             state.hashtags = json.optString("hashtags", "");
             state.ratio = "1:1".equals(json.optString("ratio")) ? "1:1" : "3:4";
             state.cropToFill = json.optBoolean("cropToFill", true);
+            state.instagramCrop = json.optBoolean("instagramCrop", true);
+            state.glassChrome = json.optBoolean("glassChrome", false);
+            state.glassImageBorder = json.optBoolean("glassImageBorder", false);
             state.cardPercent = clamp(json.optInt("cardPercent", 80), 65, 94);
             state.verticalOffset = clamp(json.optInt("verticalOffset", 0), -350, 350);
             state.darkness = clamp(json.optInt("darkness", 39), 0, 85);

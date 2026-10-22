@@ -76,6 +76,10 @@ public final class MainActivity extends Activity {
     private TextView portraitChip;
     private TextView coverChip;
     private TextView containChip;
+    private TextView instagramChip;
+    private TextView fullPortraitChip;
+    private TextView glassChromeChip;
+    private TextView glassImageBorderChip;
     private TextView saveButton;
     private TextView storyButton;
     private EditText usernameInput;
@@ -272,6 +276,47 @@ public final class MainActivity extends Activity {
         LinearLayout appearance = panel();
         content.addView(appearance, panelParams());
         sectionTitle(appearance, "03  /  APARÊNCIA", "Ajustes para reproduzir o compartilhamento");
+
+        fieldTitle(appearance, "ALTURA DO RETRATO NO STORY");
+        LinearLayout portraitViewRow = row();
+        appearance.addView(portraitViewRow, itemParams(44));
+        instagramChip = chip("IG 4:5");
+        fullPortraitChip = chip("3:4 COMPLETO");
+        portraitViewRow.addView(instagramChip, weighted());
+        portraitViewRow.addView(fullPortraitChip, weighted());
+        instagramChip.setOnClickListener(v -> {
+            state.instagramCrop = true;
+            updateChips();
+            refreshPreview();
+        });
+        fullPortraitChip.setOnClickListener(v -> {
+            state.instagramCrop = false;
+            updateChips();
+            refreshPreview();
+        });
+        TextView ratioHint = text("IG 4:5 reproduz a proporção do compartilhamento original. O modo 3:4 completo preserva toda a altura da arte.", 12, MUTED, false);
+        ratioHint.setPadding(dp(3), dp(9), dp(3), dp(2));
+        appearance.addView(ratioHint);
+
+        fieldTitle(appearance, "EFEITO DE VIDRO");
+        LinearLayout glassRow = row();
+        appearance.addView(glassRow, itemParams(44));
+        glassChromeChip = chip("VIDRO NO CARD");
+        glassImageBorderChip = chip("VIDRO NA ARTE");
+        glassRow.addView(glassChromeChip, weighted());
+        glassRow.addView(glassImageBorderChip, weighted());
+        glassChromeChip.setOnClickListener(v -> {
+            state.glassChrome = !state.glassChrome;
+            updateChips();
+            refreshPreview();
+        });
+        glassImageBorderChip.setOnClickListener(v -> {
+            state.glassImageBorder = !state.glassImageBorder;
+            updateChips();
+            refreshPreview();
+        });
+        updateChips();
+
         addSlider(appearance, "LARGURA DO CARTÃO", 65, 94, state.cardPercent, value -> {
             state.cardPercent = value;
             refreshPreview();
@@ -349,6 +394,10 @@ public final class MainActivity extends Activity {
         selectChip(portraitChip, "3:4".equals(state.ratio));
         selectChip(coverChip, state.cropToFill);
         selectChip(containChip, !state.cropToFill);
+        if (instagramChip != null) selectChip(instagramChip, state.instagramCrop);
+        if (fullPortraitChip != null) selectChip(fullPortraitChip, !state.instagramCrop);
+        if (glassChromeChip != null) selectChip(glassChromeChip, state.glassChrome);
+        if (glassImageBorderChip != null) selectChip(glassImageBorderChip, state.glassImageBorder);
     }
 
     private void selectChip(TextView view, boolean selected) {
