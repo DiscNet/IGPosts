@@ -91,13 +91,15 @@ final class StoryRenderer {
         y = Math.max(48f, Math.min(y, HEIGHT - total - 48f));
         float radius = 30f * fontScale;
 
+        // Sombra ambiente muito discreta: sem a borda preta dura ou offset evidente.
+        // O mesmo renderizador é usado no preview e no arquivo exportado.
         p.reset();
         p.setAntiAlias(true);
         p.setFilterBitmap(true);
-        p.setColor(0x55000000);
-        canvas.drawRoundRect(x - 9, y + 19, x + w + 9, y + total + 25, radius + 9, radius + 9, p);
         p.setColor(Color.WHITE);
+        p.setShadowLayer(14f * fontScale, 0f, 3f * fontScale, 0x23000000);
         canvas.drawRoundRect(x, y, x + w, y + total, radius, radius, p);
+        p.clearShadowLayer();
 
         int clip = canvas.save();
         Path clipPath = new Path();
