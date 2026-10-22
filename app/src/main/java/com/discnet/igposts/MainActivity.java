@@ -352,7 +352,7 @@ public final class MainActivity extends Activity {
     }
 
     private void selectChip(TextView view, boolean selected) {
-        view.setBackground(round(selected ? ACCENT : 0xFF303038, 10));
+        view.setBackground(borderedButton(selected ? ACCENT : 0xFF303038));
         view.setTextColor(selected ? BG : WHITE);
     }
 
@@ -752,7 +752,7 @@ public final class MainActivity extends Activity {
     private TextView chip(String value) {
         TextView view = text(value, 11, WHITE, true);
         view.setGravity(Gravity.CENTER);
-        view.setBackground(round(0xFF303038, 10));
+        view.setBackground(borderedButton(0xFF303038));
         return view;
     }
 
@@ -760,7 +760,7 @@ public final class MainActivity extends Activity {
         TextView view = text(value, 12, accent ? BG : WHITE, true);
         view.setGravity(Gravity.CENTER);
         int fill = accent ? ACCENT : 0xFF32333C;
-        GradientDrawable surface = round(fill, 12);
+        GradientDrawable surface = borderedButton(fill);
         view.setBackground(new RippleDrawable(ColorStateList.valueOf(0x33FFFFFF), surface, null));
         view.setPadding(dp(7), 0, dp(7), 0);
         return view;
@@ -778,6 +778,14 @@ public final class MainActivity extends Activity {
         if (multiline) view.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE |
                 InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);
         return view;
+    }
+
+    /** Padronização: botões com cantos de 10dp e linha branca fina. */
+    private GradientDrawable borderedButton(int fill) {
+        GradientDrawable shape = round(fill, 10);
+        float density = getResources().getDisplayMetrics().density;
+        shape.setStroke(Math.max(1, Math.round(0.7f * density)), 0xBFFFFFFF);
+        return shape;
     }
 
     private GradientDrawable round(int fill, int radiusDp) {
