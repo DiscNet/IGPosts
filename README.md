@@ -26,9 +26,31 @@ gradle :app:assembleDebug
 
 Resultado: `app/build/outputs/apk/debug/app-debug.apk`.
 
-O workflow [Android APK](.github/workflows/android.yml) compila automaticamente cada alteração enviada à branch `main` e oferece o APK na seção **Actions → Android APK → Artifacts → IGPosts-debug**. Também pode ser acionado manualmente por **Run workflow**.
+## APK direto em GitHub Releases
 
-> **Importante sobre atualizações:** o APK debug gerado em execuções diferentes do GitHub Actions pode receber assinaturas de debug diferentes. Se o Android recusar "Atualizar", desinstale a versão anterior ou configure uma chave de assinatura release permanente antes da distribuição.
+A cada push na branch `main`, o workflow [Android APK and GitHub Release](.github/workflows/android.yml) compila o aplicativo e anexa automaticamente o APK a uma nova GitHub Release. Também pode ser executado manualmente por **Run workflow**. Pull requests apenas compilam e não geram Releases.
+
+- **[Baixar APK mais recente](https://github.com/DiscNet/IGPosts/releases/latest/download/IGPosts.apk)**
+- [Ver todas as versões](https://github.com/DiscNet/IGPosts/releases)
+- O nome do arquivo baixado é sempre `IGPosts.apk` e a versão interna é `1.0.<número da execução>`.
+- O artefato em Actions permanece apenas como cópia de diagnóstico.
+
+### Assinatura de atualização permanente (opcional)
+
+Por padrão, quando ainda não existem secrets, o GitHub publica um **APK de teste assinado com chave debug temporária**. Ele instala, mas o Android pode recusar atualizações futuras por divergência de assinatura. Para permitir instalações por **Atualizar**, gere uma chave release permanente e configure, no repositório, os secrets de Actions:
+
+| Secret | Conteúdo |
+| --- | --- |
+| `IGPOSTS_KEYSTORE_BASE64` | Conteúdo completo do arquivo keystore codificado em Base64, em linha única |
+| `IGPOSTS_STORE_PASSWORD` | Senha do keystore |
+| `IGPOSTS_KEY_ALIAS` | Alias de assinatura |
+| `IGPOSTS_KEY_PASSWORD` | Senha da chave privada |
+
+**Nunca publique o arquivo de chave no repositório.** Guarde uma cópia segura: perdê-lo inviabiliza assinar atualizações da mesma instalação. Quando os quatro secrets estiverem configurados, o workflow gera e publica automaticamente um APK release assinado com essa chave. A migração de um APK debug antigo para o APK release exige uma única reinstalação.
+
+### Ícone adaptativo
+
+O ícone usa fundo em degradê de sangria total e um monograma sobre uma placa de vidro translúcido, com contornos brancos delicados e reflexos. O Android aplica a máscara do launcher; não há moldura branca fixa. A versão monocromática permite ícones temáticos do Android 13 ou posterior.
 
 ## Como usar
 
