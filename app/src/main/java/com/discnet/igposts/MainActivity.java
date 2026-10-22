@@ -218,7 +218,24 @@ public final class MainActivity extends Activity {
         profileSpinner.setBackground(round(0xFF2A2B32, 10));
         profileSpinner.setPadding(dp(10), 0, dp(10), 0);
         profilePanel.addView(profileSpinner, itemParams(48));
-        profileAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, profileNames);
+        profileAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, profileNames) {
+            @Override public View getView(int position, View convertView, ViewGroup parent) {
+                TextView item = (TextView) super.getView(position, convertView, parent);
+                item.setTextColor(WHITE);
+                item.setTextSize(14);
+                item.setPadding(dp(9), dp(7), dp(9), dp(7));
+                return item;
+            }
+            @Override public View getDropDownView(int position, View convertView, ViewGroup parent) {
+                TextView item = (TextView) super.getDropDownView(position, convertView, parent);
+                item.setTextColor(WHITE);
+                item.setTextSize(14);
+                item.setPadding(dp(16), dp(13), dp(16), dp(13));
+                item.setBackgroundColor(0xFF292A32);
+                return item;
+            }
+        };
+        profileAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         profileSpinner.setAdapter(profileAdapter);
         rebuildProfileItems();
         profileSpinner.setSelection(state.selectedProfile);
@@ -293,7 +310,9 @@ public final class MainActivity extends Activity {
         bindText(usernameInput, value -> {
             String username = value.trim().replace(" ", "");
             state.profile().username = username;
-            rebuildProfileItems();
+        });
+        usernameInput.setOnFocusChangeListener((view, focused) -> {
+            if (!focused) rebuildProfileItems();
         });
     }
 
