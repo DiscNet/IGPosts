@@ -1,4 +1,4 @@
-name: Android APK
+name: Android APK and GitHub Release
 
 on:
   push:
@@ -7,7 +7,11 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
+
+concurrency:
+  group: igposts-release-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
   build:
@@ -38,11 +42,71 @@ jobs:
           echo "ANDROID_HOME=$SDK_ROOT" >> "$GITHUB_ENV"
           yes | "$SDKMANAGER" --sdk_root="$SDK_ROOT" --licenses > /dev/null 2>&1 || true
           "$SDKMANAGER" --sdk_root="$SDK_ROOT" --install "platforms;android-35" "build-tools;35.0.0"
-      - name: Build APK
-        run: gradle --no-daemon :app:assembleDebug
-      - name: Upload debug APK
+
+      - name: Configure optional permanent release signing
+        shell: bash
+        env:
+          KEYSTORE_BASE64: ${{ secrets.IGPOSTS_KEYSTORE_BASE64 }}
+          STORE_PASSWORD: ${{ secrets.IGPOSTS_STORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.IGPOSTS_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.IGPOSTS_KEY_PASSWORD }}
+        run: |
+          if [[ -n "$KEYSTORE_BASE64" && -n "$STORE_PASSWORD" && -n "$KEY_ALIAS" && -n "$KEY_PASSWORD" ]]; then
+            printf '%s' "$KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/igposts-release.jks"
+            echo "IGPOSTS_KEYSTORE_PATH=$RUNNER_TEMP/igposts-release.jks" >> "$GITHUB_ENV"
+            echo "IGPOSTS_RELEASE_SIGNED=true" >> "$GITHUB_ENV"
+          else
+            echo "IGPOSTS_RELEASE_SIGNED=false" >> "$GITHUB_ENV"
+          fi
+
+      - name: Build and stage installable APK
+        shell: bash
+        env:
+          IGPOSTS_BUILD_NUMBER: ${{ github.run_number }}
+          IGPOSTS_STORE_PASSWORD: ${{ secrets.IGPOSTS_STORE_PASSWORD }}
+          IGPOSTS_KEY_ALIAS: ${{ secrets.IGPOSTS_KEY_ALIAS }}
+          IGPOSTS_KEY_PASSWORD: ${{ secrets.IGPOSTS_KEY_PASSWORD }}
+        run: |
+          mkdir -p dist
+          if [[ "$IGPOSTS_RELEASE_SIGNED" == "true" ]]; then
+            gradle --no-daemon :app:assembleRelease
+            cp app/build/outputs/apk/release/app-release.apk dist/IGPosts.apk
+          else
+            gradle --no-daemon :app:assembleDebug
+            cp app/build/outputs/apk/debug/app-debug.apk dist/IGPosts.apk
+          fi
+          test -s dist/IGPosts.apk
+          if [[ "$IGPOSTS_RELEASE_SIGNED" == "true" ]]; then
+            echo "APK assinado com chave release permanente." > dist/release-notes.md
+          else
+            echo "APK instalável de teste (assinatura debug)." > dist/release-notes.md
+            echo "" >> dist/release-notes.md
+            echo "Atenção: para instalar atualizações sem desinstalar, configure os quatro secrets de assinatura release descritos no README." >> dist/release-notes.md
+          fi
+          echo "" >> dist/release-notes.md
+          echo "- Ícone adaptativo sem borda branca, com placa de vidro translúcido." >> dist/release-notes.md
+          echo "- Editor offline, cartões 1:1 e 3:4 e exportação de Stories." >> dist/release-notes.md
+
+      - name: Keep CI artifact for diagnostics
         uses: actions/upload-artifact@v4
         with:
-          name: IGPosts-debug
-          path: app/build/outputs/apk/debug/app-debug.apk
+          name: IGPosts-APK
+          path: dist/IGPosts.apk
           if-no-files-found: error
+
+      - name: Publish APK directly to GitHub Releases
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG="v1.0.${{ github.run_number }}"
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release upload "$TAG" dist/IGPosts.apk --clobber
+          else
+            gh release create "$TAG" dist/IGPosts.apk \
+              --title "IGPosts $TAG" \
+              --notes-file dist/release-notes.md \
+              --latest
+          fi
+          echo "Baixar APK: https://github.com/DiscNet/IGPosts/releases/latest/download/IGPosts.apk" >> "$GITHUB_STEP_SUMMARY"

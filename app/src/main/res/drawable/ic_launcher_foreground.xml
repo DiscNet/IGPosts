@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Vidro translúcido: o launcher aplica sua própria máscara circular/quadrada. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Halo em tons frios visível através do vidro. -->
+    <path android:fillColor="#26FF91A4"
+        android:pathData="M13,49 C18,22 45,11 67,17 C82,21 92,37 91,53 C90,70 81,84 64,91 C42,98 15,80 13,49 Z" />
+    <path android:fillColor="#213EBDFF"
+        android:pathData="M38,91 C58,94 81,81 88,65 C94,52 88,33 79,28 C91,53 60,82 38,91 Z" />
+
+    <!-- Elevação local pequena (não forma uma borda externa rígida). -->
+    <path android:fillColor="#290A0B13"
+        android:pathData="M36,23 C27,23 22,29 22,38 L22,74 C22,83 28,88 37,88 L72,88 C81,88 87,82 87,73 L87,37 C87,29 81,23 72,23 Z" />
+
+    <!-- Placa de vidro: preenchimento translúcido e contorno branco delicado. -->
+    <path
+        android:fillColor="#375E6583"
+        android:strokeColor="#C2FFFFFF"
+        android:strokeWidth="1.15"
+        android:pathData="M36,21 C27,21 21,27 21,36 L21,72 C21,81 27,87 36,87 L72,87 C81,87 87,81 87,72 L87,36 C87,27 81,21 72,21 Z" />
+
+    <!-- Reflexo diagonal especular e interior fosco do painel. -->
+    <path android:fillColor="#22FFFFFF"
+        android:pathData="M36,22 C27,22 22,27 22,36 L22,52 C36,41 55,31 76,23 C74,22 72,22 70,22 Z" />
+    <path android:fillColor="#0FFFFFFF"
+        android:pathData="M31,37 C31,34 34,31 37,31 L71,31 C74,31 77,34 77,37 L77,71 C77,74 74,77 71,77 L37,77 C34,77 31,74 31,71 Z" />
+
+    <!-- Borda iluminada superior-esquerda. -->
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="#DEFFFFFF"
+        android:strokeWidth="1.15"
+        android:strokeLineCap="round"
+        android:pathData="M25,42 L25,36 C25,29.5 29.5,25 36,25 L60,25" />
+    <!-- Reflexo curto inferior-direito. -->
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="#75E8F4FF"
+        android:strokeWidth="0.95"
+        android:strokeLineCap="round"
+        android:pathData="M83,66 L83,72 C83,78.5 78.5,83 72,83 L57,83" />
+
+    <!-- Monograma IG centrado, com contornos espessos e nítidos. -->
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="#F5FFFFFF"
+        android:strokeWidth="4.4"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M38,43 L46,43 M42,43 L42,65 M38,65 L46,65" />
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="#F5FFFFFF"
+        android:strokeWidth="4.4"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M70,47 C67.5,43.5 64.5,42.5 60.5,43 C53.8,43.5 51.5,48.7 51.5,54 C51.5,61.8 55.5,66.5 62,66 C65.6,65.8 68.3,64.2 70,61 L70,54.5 L63.5,54.5" />
+
+    <!-- Pequeno brilho de precisão, contido no ícone. -->
+    <path android:fillColor="#CFF7FAFF"
+        android:pathData="M74,32 L75.4,35.6 L79,37 L75.4,38.4 L74,42 L72.6,38.4 L69,37 L72.6,35.6 Z" />
+</vector>

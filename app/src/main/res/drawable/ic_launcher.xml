@@ -1,15 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="108dp"
-    android:height="108dp"
-    android:viewportWidth="108"
-    android:viewportHeight="108">
-    <path android:fillColor="#131419"
-        android:pathData="M0,0 L108,0 L108,108 L0,108 Z" />
-    <path android:fillColor="#FF8862"
-        android:pathData="M23,24 L85,24 L85,84 L23,84 Z" />
-    <path android:fillColor="#131419"
-        android:pathData="M31,32 L77,32 L77,76 L31,76 Z" />
-    <path android:fillColor="#FFFFFF"
-        android:pathData="M38,40 L45,40 L45,68 L38,68 Z M51,40 L68,40 L68,46 L58,46 L58,51 L67,51 L67,57 L58,57 L58,68 L51,68 Z"/>
-</vector>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@drawable/ic_launcher_background" />
+    <item android:drawable="@drawable/ic_launcher_foreground" />
+</layer-list>

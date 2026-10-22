@@ -2,6 +2,16 @@ plugins {
     id 'com.android.application'
 }
 
+// Incrementa o versionCode em cada execução do GitHub Actions.
+// A mesma assinatura é necessária para instalar uma versão sobre outra.
+def ciBuild = (System.getenv('IGPOSTS_BUILD_NUMBER') ?: '1').toInteger()
+def releaseKeystore = System.getenv('IGPOSTS_KEYSTORE_PATH')
+def releaseStorePassword = System.getenv('IGPOSTS_STORE_PASSWORD')
+def releaseKeyAlias = System.getenv('IGPOSTS_KEY_ALIAS')
+def releaseKeyPassword = System.getenv('IGPOSTS_KEY_PASSWORD')
+def hasReleaseSigning = [releaseKeystore, releaseStorePassword, releaseKeyAlias, releaseKeyPassword]
+        .every { it != null && !it.trim().isEmpty() }
+
 android {
     namespace 'com.discnet.igposts'
     compileSdk 35
@@ -10,8 +20,19 @@ android {
         applicationId 'com.discnet.igposts'
         minSdk 29
         targetSdk 35
-        versionCode 1
-        versionName '1.0.0'
+        versionCode ciBuild
+        versionName "1.0.${ciBuild}"
+    }
+
+    signingConfigs {
+        release {
+            if (hasReleaseSigning) {
+                storeFile file(releaseKeystore)
+                storePassword releaseStorePassword
+                keyAlias releaseKeyAlias
+                keyPassword releaseKeyPassword
+            }
+        }
     }
 
     compileOptions {
@@ -22,6 +43,9 @@ android {
     buildTypes {
         release {
             minifyEnabled false
+            if (hasReleaseSigning) {
+                signingConfig signingConfigs.release
+            }
         }
     }
 }
