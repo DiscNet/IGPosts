@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101116">
+  <meta name="description" content="IGPosts Story Studio — crie imagens para Stories do Instagram.">
+  <title>IGPosts — Story Studio</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="./" aria-label="IGPosts início">
+      <strong>IGPOSTS.</strong>
+      <span>STORY STUDIO / WEB</span>
+    </a>
+    <button id="exportTop" class="button primary">SALVAR PNG</button>
+  </header>
+
+  <main class="workspace">
+    <section class="preview-column">
+      <div class="section-heading">
+        <div><span class="eyebrow">PRÉ-VISUALIZAÇÃO</span><h1>Seu Story</h1></div>
+        <span class="muted">1080 × 1920</span>
+      </div>
+      <div class="preview-frame">
+        <canvas id="preview" width="1080" height="1920" aria-label="Prévia do Story"></canvas>
+      </div>
+      <p class="preview-note">A imagem é uma simulação visual do compartilhamento. Não publica diretamente no Instagram.</p>
+    </section>
+
+    <section class="editor-column">
+      <section class="panel">
+        <div class="panel-heading"><span class="eyebrow">01 / PUBLICAÇÃO</span><h2>Imagem e conteúdo</h2></div>
+        <label class="button secondary file-button">＋ IMPORTAR ARTE<input id="artworkInput" type="file" accept="image/*"></label>
+        <p id="artworkName" class="file-name">Nenhuma arte selecionada</p>
+
+        <label class="field-label">PROPORÇÃO DO POST</label>
+        <div class="segmented">
+          <button data-ratio="1:1">1:1 · QUADRADO</button>
+          <button data-ratio="3:4" class="active">3:4 · RETRATO</button>
+        </div>
+
+        <label class="field-label">ENQUADRAMENTO DA ARTE</label>
+        <div class="segmented">
+          <button data-crop="cover" class="active">PREENCHER</button>
+          <button data-crop="contain">ENCAIXAR</button>
+        </div>
+
+        <label class="field-label" for="caption">LEGENDA</label>
+        <textarea id="caption" rows="3" placeholder="Escreva sua legenda…"></textarea>
+        <label class="field-label" for="hashtags">HASHTAGS</label>
+        <textarea id="hashtags" rows="2" placeholder="#graphicdesign #designgrafico"></textarea>
+      </section>
+
+      <section class="panel">
+        <div class="panel-heading"><span class="eyebrow">02 / PERFIL</span><h2>Identidade</h2></div>
+        <label class="field-label" for="profileSelect">PERFIL ATIVO</label>
+        <div class="profile-actions">
+          <select id="profileSelect"></select>
+          <button id="addProfile" class="button secondary compact">NOVO</button>
+          <button id="removeProfile" class="button secondary compact">REMOVER</button>
+        </div>
+        <label class="field-label" for="username">NOME DE USUÁRIO</label>
+        <input id="username" type="text" maxlength="40" placeholder="seu_usuario">
+        <label class="button secondary file-button">◉ ESCOLHER FOTO DE PERFIL<input id="avatarInput" type="file" accept="image/*"></label>
+      </section>
+
+      <section class="panel">
+        <div class="panel-heading"><span class="eyebrow">03 / APARÊNCIA</span><h2>Acabamento</h2></div>
+        <label class="field-label">ALTURA DO RETRATO NO STORY</label>
+        <div class="segmented">
+          <button id="instagramCrop" class="active">IG 4:5</button>
+          <button id="fullPortrait">3:4 COMPLETO</button>
+        </div>
+        <label class="field-label">EFEITO DE VIDRO</label>
+        <div class="segmented">
+          <button id="glassCard" aria-pressed="false">VIDRO NO CARD</button>
+          <button id="glassArt" aria-pressed="false">VIDRO NA ARTE</button>
+        </div>
+        <div class="range-field"><label for="cardPercent">LARGURA DO CARTÃO <output id="cardPercentValue">80</output></label><input id="cardPercent" type="range" min="65" max="94" value="80"></div>
+        <div class="range-field"><label for="verticalOffset">POSIÇÃO VERTICAL <output id="verticalOffsetValue">0</output></label><input id="verticalOffset" type="range" min="-350" max="350" value="0"></div>
+        <div class="range-field"><label for="darkness">ESCURECIMENTO DO FUNDO <output id="darknessValue">39</output></label><input id="darkness" type="range" min="0" max="85" value="39"></div>
+      </section>
+
+      <section class="panel export-panel">
+        <div class="panel-heading"><span class="eyebrow">04 / EXPORTAÇÃO</span><h2>Arquivo final</h2></div>
+        <button id="exportButton" class="button primary wide">↓ SALVAR EM 1080 × 1920</button>
+        <p class="preview-note">O PNG é gerado localmente no navegador. Suas imagens e configurações não são enviadas para um servidor.</p>
+      </section>
+    </section>
+  </main>
+  <script src="./app.js" defer></script>
+</body>
+</html>
